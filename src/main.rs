@@ -1,4 +1,5 @@
 mod game;
+use ggez::input::keyboard::KeyCode;
 use ggez::conf::{self};
 use ggez::{glam, graphics, GameResult};
 use ggez::graphics::Color;
@@ -53,6 +54,11 @@ impl MainState {
 
 impl ggez::event::EventHandler<GameError> for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
+        let k_ctx = &ctx.keyboard;
+        if k_ctx.is_key_pressed(KeyCode::Up) {
+            self.right_paddle.move_up();
+            dbg!(&self.right_paddle.hitbox.y);
+        }
         Ok(())
     }
 
@@ -76,14 +82,12 @@ fn main() -> GameResult {
         backend: conf::Backend::default(),
     };
 
-    dbg!(&c);
-
     let (ctx, event_loop) = ContextBuilder::new("Pong", "nightcat")
         .default_conf(c.clone())
         .build()
         .unwrap();
     
-    let state = MainState::new(&ctx, &c, WINDOW_WIDTH);
+    let state = MainState::new(&ctx, &c, WINDOW_HEIGHT);
     
     event::run(ctx, event_loop, state)
 }
