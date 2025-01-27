@@ -1,4 +1,6 @@
 mod game;
+use std::collections::HashSet;
+
 use ggez::input::keyboard::KeyCode;
 use ggez::conf::{self};
 use ggez::{glam, graphics, GameResult};
@@ -55,9 +57,22 @@ impl MainState {
 impl ggez::event::EventHandler<GameError> for MainState {
     fn update(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
         let k_ctx = &ctx.keyboard;
-        if k_ctx.is_key_pressed(KeyCode::Up) {
+
+        // Movement logic for left paddle
+        if self.left_paddle.is_in_bounds_up() & k_ctx.is_key_pressed(KeyCode::W) {
+            self.left_paddle.move_up();
+        }
+
+        if self.left_paddle.is_in_bounds_down() & k_ctx.is_key_pressed(KeyCode::S) {
+                self.left_paddle.move_down()
+        }
+
+        if self.right_paddle.is_in_bounds_up() & k_ctx.is_key_pressed(KeyCode::Up) {
             self.right_paddle.move_up();
-            dbg!(&self.right_paddle.hitbox.y);
+        }
+
+        if self.right_paddle.is_in_bounds_down() & k_ctx.is_key_pressed(KeyCode::Down) {
+            self.right_paddle.move_down()
         }
         Ok(())
     }
@@ -65,9 +80,21 @@ impl ggez::event::EventHandler<GameError> for MainState {
     fn draw(&mut self, ctx: &mut ggez::Context) -> Result<(), GameError> {
         let mut canvas = Canvas::from_frame(ctx, Color::BLACK);
         canvas.set_screen_coordinates(Rect::new(0.0,0.0,100.0,100.0));
-        let my_dest = glam::vec2(0.0, 0.0);
-        canvas.draw(&self.left_paddle.mesh, graphics::DrawParam::new().dest(my_dest));
-        canvas.draw(&self.right_paddle.mesh, graphics::DrawParam::new().dest(my_dest));
+        canvas.draw(
+            &graphics::Quad,
+            graphics::DrawParam::new()
+                .dest(self.left_paddle.hitbox.point())
+                .scale(self.left_paddle.hitbox.size())
+                .color(Color::WHITE),
+        );
+
+        canvas.draw(
+            &graphics::Quad,
+            graphics::DrawParam::new()
+                .dest(self.right_paddle.hitbox.point())
+                .scale(self.right_paddle.hitbox.size())
+                .color(Color::WHITE),
+        );
 
         canvas.finish(ctx)
     }
@@ -77,7 +104,8 @@ impl ggez::event::EventHandler<GameError> for MainState {
 fn main() -> GameResult {
 
     let c = ggez::conf::Conf {
-        window_mode: ggez::conf::WindowMode::default().resize_on_scale_factor_change(true),
+        window_mode: ggez::conf::WindowMode::default()
+            .resize_on_scale_factor_change(true),
         window_setup: conf::WindowSetup::default(),
         backend: conf::Backend::default(),
     };

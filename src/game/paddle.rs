@@ -1,11 +1,10 @@
 use ggez::*;
-use graphics::{Drawable, Mesh, Rect};
-use crate::WINDOW_WIDTH;
+use graphics::{Mesh, Rect};
+use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
 #[derive(Debug)]
 pub struct Paddle{
     pub hitbox: Rect,
-    pub mesh: Mesh,
     pub speed: f32,
 }
 
@@ -28,17 +27,8 @@ fn left_paddle(ctx: &Context, screen_height:f32, paddle_height:f32) -> Paddle {
         paddle_height,
     );
 
-    let mesh = Mesh::new_rectangle(
-        ctx, 
-        graphics::DrawMode::fill(), 
-        hitbox, 
-        graphics::Color::WHITE,
-    );
-
     Paddle { 
         hitbox,
-        mesh: mesh.
-            expect("Could not create mesh (impl Paddle in paddle.rs)"),
         speed: 1.0 
     }
 }
@@ -59,18 +49,9 @@ fn right_paddle(ctx: &Context, screen_height:f32, paddle_height:f32) -> Paddle {
         paddle_height,
     );
 
-    let mesh = Mesh::new_rectangle(
-        ctx, 
-        graphics::DrawMode::fill(), 
-        hitbox, 
-        graphics::Color::WHITE,
-    );
-
     Paddle { 
         hitbox,
-        mesh: mesh.
-            expect("Could not create mesh (impl Paddle in paddle.rs)"),
-        speed: 10.0 
+        speed: 1.0 
     }
 }
 
@@ -88,11 +69,19 @@ impl Paddle {
     }
 
     pub fn move_up(&mut self) {
-        dbg!(self. -= self.speed);
+        self.hitbox.y -= self.speed;
     }
 
     pub fn move_down(&mut self) {
         self.hitbox.y += self.speed
+    }
+
+    pub fn is_in_bounds_up(&self) -> bool {
+        self.hitbox.top() > 0.0
+    }
+    
+    pub fn is_in_bounds_down(&self) -> bool {
+        self.hitbox.bottom() < WINDOW_HEIGHT
     }
 }
 
