@@ -1,5 +1,5 @@
 use ggez::*;
-use graphics::{Mesh, Rect};
+use graphics::Rect;
 use crate::{WINDOW_HEIGHT, WINDOW_WIDTH};
 
 #[derive(Debug)]
@@ -14,7 +14,7 @@ pub enum Location{
 }
 
 /// Creates new paddle for the left side, the width is fixed.
-fn left_paddle(ctx: &Context, screen_height:f32, paddle_height:f32) -> Paddle {
+fn left_paddle(screen_height:f32, paddle_height:f32) -> Paddle {
     let left_border = 0.0;
     let paddle_x = left_border + 5.0;
     let paddle_y = screen_height/2.0 - paddle_height / 2.0;
@@ -34,7 +34,7 @@ fn left_paddle(ctx: &Context, screen_height:f32, paddle_height:f32) -> Paddle {
 }
 
 /// Creates new paddle for the right side, the width is fixed.
-fn right_paddle(ctx: &Context, screen_height:f32, paddle_height:f32) -> Paddle {
+fn right_paddle(screen_height:f32, paddle_height:f32) -> Paddle {
     let right_border = WINDOW_WIDTH;
     let paddle_width = 2.0;
     // Might look weird, but is needed to compensate for the paddles width
@@ -57,14 +57,13 @@ fn right_paddle(ctx: &Context, screen_height:f32, paddle_height:f32) -> Paddle {
 
 impl Paddle {
     pub fn new(
-        ctx: &Context, 
         location: Location, 
         screen_height:f32, 
         paddle_height:f32) -> Paddle {
 
         match location {
-            Location::Left => left_paddle(ctx, screen_height, paddle_height),
-            Location::Right => right_paddle(ctx, screen_height, paddle_height),
+            Location::Left => left_paddle(screen_height, paddle_height),
+            Location::Right => right_paddle(screen_height, paddle_height),
         }
     }
 
@@ -83,5 +82,6 @@ impl Paddle {
     pub fn is_in_bounds_down(&self) -> bool {
         self.hitbox.bottom() < WINDOW_HEIGHT
     }
+    
 }
 
